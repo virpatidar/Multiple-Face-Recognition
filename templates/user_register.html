@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Registration</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+
+      <h1>User Registration</h1>
+      <p class="subtitle">
+        Register once to enable face-based attendance
+      </p>
+
+      <form method="POST" action="/user/register" enctype="multipart/form-data">
+
+        <!-- Name -->
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="Enter your full name" required>
+        </div>
+
+        <!-- College ID -->
+        <div class="form-group">
+          <label>College ID</label>
+          <input type="text" name="college_id" placeholder="Enter college ID" required>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="tel" name="mobile" placeholder="Enter mobile number" pattern="[0-9]{10}" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email ID</label>
+          <input type="email" name="email" placeholder="Enter email address" required>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Create password" required>
+        </div>
+
+        <!-- Camera Capture -->
+        <!-- Camera Section -->
+<div class="camera-wrapper" id="cameraBox" style="display:none;">
+  <video id="video" autoplay muted></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div style="text-align:center; margin-top:10px;">
+    <span id="captureCount">Captured: 0 / 15</span>
+  </div>
+</div>
+
+<button type="button" class="btn" onclick="startCamera()">
+  Open Camera & Capture Face
+</button>
+
+        <!-- Hidden image input -->
+        <input type="hidden" name="face_image" id="face_image">
+
+        <!-- Submit -->
+        <button type="submit" class="btn" style="margin-top: 15px;">
+          Register
+        </button>
+
+      </form>
+
+      <!-- Already Registered -->
+      <div class="nav-links">
+        Already registered?
+        <a href="/user/login">Login here</a>
+      </div>
+
+      <div class="nav-links">
+        <a href="/">← Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Camera Script -->
+  <script>
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let countText = document.getElementById("captureCount");
+let captured = 0;
+let stream = null;
+
+function startCamera() {
+  document.getElementById("cameraBox").style.display = "block";
+
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(s => {
+      stream = s;
+      video.srcObject = stream;
+      autoCapture();
+    })
+    .catch(() => alert("Camera access denied"));
+}
+
+function autoCapture() {
+  const interval = setInterval(() => {
+    if (captured >= 15) {
+      stream.getTracks().forEach(t => t.stop());
+      clearInterval(interval);
+      alert("Face capture completed!");
+      return;
+    }
+
+    captureFrame();
+  }, 1000); // 1 image per second
+}
+
+function captureFrame() {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+
+  canvas.toBlob(blob => {
+    let formData = new FormData();
+    formData.append("image", blob);
+
+    fetch("/capture_face", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "ok") {
+        captured++;
+        countText.innerText = `Captured: ${captured} / 15`;
+      }
+    });
+  }, "image/jpeg");
+}
+</script>
+
+
+</body>
+</html>

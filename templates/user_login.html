@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Login</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+
+      <h1>User Login</h1>
+      <p class="subtitle">
+        Login to view your attendance record
+      </p>
+
+      <form method="POST" action="/user/login">
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email ID</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter registered email"
+            required
+          >
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            required
+          >
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="btn" style="margin-top: 10px;">
+          Login
+        </button>
+
+      </form>
+
+      <!-- Links -->
+      <div class="nav-links">
+        <a href="/user/register">New user? Register here</a>
+      </div>
+
+      <div class="nav-links">
+        <a href="/">← Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
